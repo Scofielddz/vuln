@@ -41,11 +41,23 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-
     - if: matrix.build-mode == 'manual'
-      name: Build C/C++ project manually
+      shell: bash
       run: |
-        make -j$(nproc)
+        echo "Running manual C/C++ build"
+
+        # Example: Compile each .c file in each CWE subdirectory into separate executables
+        for dir in ./CWE-*; do
+          echo "Building in directory: $dir"
+          for src in "$dir"/*.c; do
+            if [ -f "$src" ]; then
+              # Strip path and extension to get executable name
+              exe_name=$(basename "$src" .c)
+              echo "Compiling $src -> $dir/$exe_name"
+              gcc "$src" -o "$dir/$exe_name" || echo "Failed to compile $src"
+            fi
+          done
+        done
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
