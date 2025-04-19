@@ -45,9 +45,6 @@ jobs:
     - if: matrix.build-mode == 'manual'
       name: Build C/C++ project manually
       run: |
-        mkdir build
-        cd build
-        cmake ..
         make -j$(nproc)
 
     - name: Perform CodeQL Analysis
